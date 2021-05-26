@@ -16,11 +16,10 @@ def pingtest():
     # Get variables from config
     pingtestip = config.get('config', 'pingtestip')
     shutdowntime = config.get('config', 'shutdowntime')
-
-    print(f'[!] Pinging {pingtestip}')
-
+    print(f'[*] Pinging {pingtestip}')
+    # Start the ping
     p = ping(pingtestip, count=10)
-    
+    # If the ping is all good we notify the console and start again.
     if p.success():
         print(f'[*] No issue with {pingtestip} Online')
         pingtest()
@@ -28,21 +27,25 @@ def pingtest():
         print(f'[!] {pingtestip} has gone offline shuttding down the firewalls in {shutdowntime}')
         time.sleep(shutdowntime)
         # Failsafe just incase it's come online again
+        # The pinging should be put in a funciton so we're not repeating the code here but it works.
         print(f'[*] Doing final test for {pingtestip} to be back online')
         p = ping(pingtestip, count=10)
         if p.success():
             print(f'[*] {pingtestip} Back online')
-            # Restart the ping test
+            # Restart the function from the start
             pingtest()
         else:
+            # Final test fails we test again
             print(f'[!] {pingtestip} is still down, shutting down the firewall')
             shutdown()
 
 
 def shutdown():
+    # Create variables out of the config file
     firewalluser = config.get('config', 'firewalluser')
     firewallpass = config.get('config', 'firewallpass')
     print('[!] Starting shutdown of firewall')
+    # Create SSH connection
     child = pexpect.spawnu(f'/usr/bin/ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no\
                             -o PubkeyAuthentication=no {firewalluser}@172.16.16.16', encoding='utf-8')
 
