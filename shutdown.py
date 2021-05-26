@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Import utility to ping
 from pythonping import ping        
 # pexepct for interaction                                               
